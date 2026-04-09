@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { Pressable, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+
+const PRIMARY = '#6C63FF';
 
 export default function TabsLayout() {
   const { logout } = useAuth();
@@ -10,10 +12,12 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#6C63FF',
+        tabBarActiveTintColor: PRIMARY,
+        tabBarInactiveTintColor: '#999',
+        tabBarStyle: s.tabBar,
+        tabBarLabelStyle: s.tabLabel,
       }}
     >
-
       <Tabs.Screen
         name="home"
         options={{
@@ -51,19 +55,46 @@ export default function TabsLayout() {
           tabBarButton: () => (
             <Pressable
               onPress={logout}
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              style={({ pressed }) => [s.sairBtn, pressed && s.sairPressed]}
             >
-              <Ionicons name="log-out" size={24} color="#687076" />
-              <Text style={{ fontSize: 10, color: '#687076' }}>Sair</Text>
+              <Ionicons name="log-out-outline" size={22} color="#EF4444" />
+              <Text style={s.sairText}>Sair</Text>
             </Pressable>
           ),
         }}
       />
-      
     </Tabs>
   );
 }
+
+const s = StyleSheet.create({
+  tabBar: {
+    height: 60,
+    paddingBottom: 6,
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    backgroundColor: '#fff',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+  },
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  sairBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  sairPressed: { opacity: 0.5 },
+  sairText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#EF4444',
+  },
+});

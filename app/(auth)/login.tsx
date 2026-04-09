@@ -1,12 +1,26 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Text, TextInput, View, Pressable } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
+
+const PRIMARY = '#6C63FF';
 
 export default function Login() {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const { login } = useAuth();
+  const insets = useSafeAreaInsets();
 
   function handleLogin() {
     console.log('Login:', cpf, senha);
@@ -14,117 +28,150 @@ export default function Login() {
   }
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-        Login
-      </Text>
-
-      <TextInput
-        placeholder="CPF"
-        value={cpf}
-        onChangeText={setCpf}
-        keyboardType="default"
-        autoCapitalize="none"
-        style={{
-          borderWidth: 1,
-          marginTop: 10,
-          padding: 10,
-          borderRadius: 15,
-        }}
-      />
-
-      <TextInput
-        placeholder="Senha"
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry={false}
-        keyboardType="default"
-        style={{
-          borderWidth: 1,
-          marginTop: 10,
-          marginBottom: 10,
-          padding: 10,
-          borderRadius: 15,
-        }}
-      />
-
-      <Pressable
-        onPress={handleLogin}
-        style={({ pressed }) => ({
-          backgroundColor: pressed ? '#45a049' : '#4CAF50',
-          paddingVertical: 14,
-          paddingHorizontal: 20,
-          borderRadius: 15,
-          alignItems: 'center',
-          marginTop: 10,
-          marginBottom: 10,
-          borderWidth: 1,
-          borderColor: '#3e8e41',
-          opacity: pressed ? 0.8 : 1,
-        })}
+    <KeyboardAvoidingView
+      style={s.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={[s.container, { paddingTop: insets.top + 48 }]}
+        keyboardShouldPersistTaps="handled"
       >
-        <Text
-          style={{
-            color: '#fff',
-            fontSize: 16,
-            fontWeight: '600',
-          }}
-        >
-          Entrar
-        </Text>
-      </Pressable>
+        <View style={s.header}>
+          <Ionicons name="school" size={64} color={PRIMARY} />
+          <Text style={s.title}>Universidade</Text>
+          <Text style={s.subtitle}>Acesse sua conta para continuar</Text>
+        </View>
 
-      <Pressable
-        onPress={() => router.push('/(auth)/cadastro')}
-        style={({ pressed }) => ({
-          backgroundColor: pressed ? '#1976D2' : '#2196F3',
-          paddingVertical: 14,
-          paddingHorizontal: 20,
-          borderRadius: 15,
-          alignItems: 'center',
-          marginTop: 10,
-          marginBottom: 10,
-          borderWidth: 1,
-          borderColor: '#1565C0',
-          opacity: pressed ? 0.8 : 1,
-        })}
-      >
-        <Text
-          style={{
-            color: '#fff',
-            fontSize: 16,
-            fontWeight: '600',
-          }}
-        >
-          Cadastrar
-        </Text>
-      </Pressable>
+        <View style={s.form}>
+          <Text style={s.label}>CPF</Text>
+          <TextInput
+            placeholder="000.000.000-00"
+            placeholderTextColor="#999"
+            value={cpf}
+            onChangeText={setCpf}
+            keyboardType="numeric"
+            autoCapitalize="none"
+            style={s.input}
+          />
 
-      <Pressable
-        onPress={() => router.push('/(auth)/esqueceu-senha')}
-        style={({ pressed }) => ({
-          backgroundColor: pressed ? '#e0e0e0' : '#f5f5f5',
-          paddingVertical: 14,
-          paddingHorizontal: 20,
-          borderRadius: 15,
-          alignItems: 'center',
-          marginTop: 10,
-          marginBottom: 10,
-          borderWidth: 1,
-          borderColor: '#ccc',
-          opacity: pressed ? 0.8 : 1,
-        })}
-      >
-        <Text
-          style={{
-            color: '#333',
-            fontSize: 15,
-            fontWeight: '500',
-          }}
-        >
-          Esqueci minha senha
-        </Text>
-      </Pressable>
-    </View>
+          <Text style={s.label}>Senha</Text>
+          <TextInput
+            placeholder="Digite sua senha"
+            placeholderTextColor="#999"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+            style={s.input}
+          />
+
+          <Pressable
+            onPress={handleLogin}
+            style={({ pressed }) => [s.btnPrimary, pressed && s.btnPressed]}
+          >
+            <Ionicons name="log-in-outline" size={20} color="#fff" />
+            <Text style={s.btnPrimaryText}>Entrar</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => router.push('/(auth)/cadastro')}
+            style={({ pressed }) => [s.btnOutline, pressed && s.btnPressed]}
+          >
+            <Ionicons name="person-add-outline" size={20} color={PRIMARY} />
+            <Text style={s.btnOutlineText}>Criar conta</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => router.push('/(auth)/esqueceu-senha')}
+            style={({ pressed }) => [s.btnLink, pressed && s.btnPressed]}
+          >
+            <Text style={s.btnLinkText}>Esqueci minha senha</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
+
+const s = StyleSheet.create({
+  flex: { flex: 1, backgroundColor: '#fff' },
+  container: {
+    flexGrow: 1,
+    paddingHorizontal: 28,
+    paddingBottom: 32,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1a1a2e',
+    marginTop: 12,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#666',
+    marginTop: 6,
+  },
+  form: { gap: 6 },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 10,
+    marginBottom: 4,
+    marginLeft: 4,
+  },
+  input: {
+    backgroundColor: '#f5f5f8',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    color: '#1a1a2e',
+  },
+  btnPrimary: {
+    backgroundColor: PRIMARY,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+  btnPrimaryText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  btnOutline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 15,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: PRIMARY,
+    marginTop: 10,
+  },
+  btnOutlineText: {
+    color: PRIMARY,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  btnLink: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginTop: 4,
+  },
+  btnLinkText: {
+    color: '#888',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  btnPressed: { opacity: 0.7 },
+});
