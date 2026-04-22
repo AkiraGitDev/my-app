@@ -22,7 +22,7 @@ export default function Home() {
         <View style={s.cardContent}>
           <Text style={s.cardTitle}>Avisos</Text>
           <Text style={s.cardText}>
-            Fique atento aos comunicados da coordena\u00e7\u00e3o e prazos importantes.
+            Fique atento aos comunicados da coordenação e prazos importantes.
           </Text>
         </View>
       </View>
@@ -44,7 +44,7 @@ export default function Home() {
           <Ionicons name="newspaper-outline" size={24} color="#10B981" />
         </View>
         <View style={s.cardContent}>
-          <Text style={s.cardTitle}>Not\u00edcias</Text>
+          <Text style={s.cardTitle}>Notícias</Text>
           <Text style={s.cardText}>
             Acompanhe as novidades sobre a universidade e os cursos.
           </Text>

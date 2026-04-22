@@ -21,8 +21,8 @@ export default function Sobre() {
 
       <View style={s.card}>
         <Text style={s.cardText}>
-          Nossa universidade oferece ensino de qualidade, inova\u00e7\u00e3o e
-          excel\u00eancia. Formamos profissionais preparados para os desafios do
+          Nossa universidade oferece ensino de qualidade, inovação e
+          excelência. Formamos profissionais preparados para os desafios do
           mercado de trabalho, com foco em tecnologia e desenvolvimento humano.
         </Text>
       </View>

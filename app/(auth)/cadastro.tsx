@@ -13,6 +13,13 @@ import {
 
 const PRIMARY = '#6C63FF';
 
+type Erros = {
+  nome?: string;
+  cpf?: string;
+  idade?: string;
+  cep?: string;
+};
+
 export default function Cadastro() {
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
@@ -24,12 +31,15 @@ export default function Cadastro() {
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
 
-  async function buscarCEP(value: string) {
-    setCep(value);
+  const [erros, setErros] = useState<Erros>({});
 
-    if (value.length === 8) {
+  async function buscarCEP(value: string) {
+    const numeros = value.replace(/\D/g, '');
+    setCep(numeros);
+
+    if (numeros.length === 8) {
       try {
-        const response = await fetch(`https://viacep.com.br/ws/${value}/json/`);
+        const response = await fetch(`https://viacep.com.br/ws/${numeros}/json/`);
         const data = await response.json();
 
         setRua(data.logradouro);
@@ -42,6 +52,36 @@ export default function Cadastro() {
   }
 
   function handleCadastro() {
+    const novosErros: Erros = {};
+    const cpfNumeros = cpf.replace(/\D/g, '');
+    const cepNumeros = cep.replace(/\D/g, '');
+    const idadeNumero = Number(idade);
+
+    if (!nome.trim()) {
+      novosErros.nome = 'Informe seu nome';
+    }
+
+    if (!cpfNumeros) {
+      novosErros.cpf = 'Informe o CPF';
+    } else if (cpfNumeros.length !== 11) {
+      novosErros.cpf = 'O CPF deve ter 11 dígitos';
+    }
+
+    if (!idade) {
+      novosErros.idade = 'Informe a idade';
+    } else if (!Number.isInteger(idadeNumero) || idadeNumero <= 0) {
+      novosErros.idade = 'A idade deve ser um número válido';
+    }
+
+    if (!cepNumeros) {
+      novosErros.cep = 'Informe o CEP';
+    } else if (cepNumeros.length !== 8) {
+      novosErros.cep = 'O CEP deve ter 8 dígitos';
+    }
+
+    setErros(novosErros);
+    if (Object.keys(novosErros).length > 0) return;
+
     console.log({ nome, cpf, idade, curso, cep, rua, cidade, estado });
   }
 
@@ -69,18 +109,23 @@ export default function Cadastro() {
           <TextInput
             placeholder="Seu nome"
             placeholderTextColor="#999"
+            value={nome}
             onChangeText={setNome}
-            style={s.input}
+            style={[s.input, erros.nome && s.inputErro]}
           />
+          {erros.nome && <Text style={s.erro}>{erros.nome}</Text>}
 
           <Text style={s.label}>CPF</Text>
           <TextInput
             placeholder="000.000.000-00"
             placeholderTextColor="#999"
-            onChangeText={setCpf}
+            value={cpf}
+            onChangeText={(v) => setCpf(v.replace(/\D/g, ''))}
             keyboardType="numeric"
-            style={s.input}
+            maxLength={11}
+            style={[s.input, erros.cpf && s.inputErro]}
           />
+          {erros.cpf && <Text style={s.erro}>{erros.cpf}</Text>}
 
           <View style={s.row}>
             <View style={s.rowHalf}>
@@ -88,10 +133,13 @@ export default function Cadastro() {
               <TextInput
                 placeholder="Ex: 20"
                 placeholderTextColor="#999"
-                onChangeText={setIdade}
+                value={idade}
+                onChangeText={(v) => setIdade(v.replace(/\D/g, ''))}
                 keyboardType="numeric"
-                style={s.input}
+                maxLength={3}
+                style={[s.input, erros.idade && s.inputErro]}
               />
+              {erros.idade && <Text style={s.erro}>{erros.idade}</Text>}
             </View>
             <View style={s.rowHalf}>
               <Text style={s.label}>Curso</Text>
@@ -106,7 +154,7 @@ export default function Cadastro() {
         </View>
 
         <View style={s.section}>
-          <Text style={s.sectionTitle}>Endere\u00e7o</Text>
+          <Text style={s.sectionTitle}>Endereço</Text>
 
           <Text style={s.label}>CEP</Text>
           <TextInput
@@ -115,8 +163,10 @@ export default function Cadastro() {
             value={cep}
             onChangeText={buscarCEP}
             keyboardType="numeric"
-            style={s.input}
+            maxLength={8}
+            style={[s.input, erros.cep && s.inputErro]}
           />
+          {erros.cep && <Text style={s.erro}>{erros.cep}</Text>}
 
           <Text style={s.label}>Rua</Text>
           <TextInput
@@ -226,6 +276,15 @@ const s = StyleSheet.create({
   inputDisabled: {
     backgroundColor: '#ebebef',
     color: '#888',
+  },
+  inputErro: {
+    borderColor: '#e53935',
+  },
+  erro: {
+    color: '#e53935',
+    fontSize: 13,
+    marginTop: 4,
+    marginLeft: 4,
   },
   row: {
     flexDirection: 'row',

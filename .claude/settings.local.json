@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm root *)",
+      "Bash(npm list *)",
+      "Bash(npm config *)"
+    ]
+  }
+}

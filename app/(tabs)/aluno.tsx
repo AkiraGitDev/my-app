@@ -12,8 +12,8 @@ export default function Aluno() {
       style={s.flex}
       contentContainerStyle={[s.container, { paddingTop: insets.top + 16 }]}
     >
-      <Text style={s.title}>\u00c1rea do Aluno</Text>
-      <Text style={s.subtitle}>Acompanhe sua vida acad\u00eamica</Text>
+      <Text style={s.title}>Sessão do Aluno</Text>
+      <Text style={s.subtitle}>Acompanhe sua vida acadêmica</Text>
 
       <View style={s.card}>
         <View style={[s.cardIconBg, { backgroundColor: '#eef2ff' }]}>
@@ -29,9 +29,9 @@ export default function Aluno() {
         <View style={[s.cardIconBg, { backgroundColor: '#fef3c7' }]}>
           <Ionicons name="calendar" size={28} color="#F59E0B" />
         </View>
-        <Text style={s.cardTitle}>Frequ\u00eancia</Text>
+        <Text style={s.cardTitle}>Frequência</Text>
         <Text style={s.cardText}>
-          Verifique seu percentual de presen\u00e7a e evite reprova\u00e7\u00e3o por falta.
+          Verifique seu percentual de presenença e evite reprovação por falta.
         </Text>
       </View>
 
@@ -41,7 +41,7 @@ export default function Aluno() {
         </View>
         <Text style={s.cardTitle}>Financeiro</Text>
         <Text style={s.cardText}>
-          Acompanhe boletos, pagamentos e situa\u00e7\u00e3o financeira.
+          Acompanhe boletos, pagamentos e situação financeira.
         </Text>
       </View>
     </ScrollView>

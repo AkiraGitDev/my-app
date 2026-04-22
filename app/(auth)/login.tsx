@@ -19,11 +19,29 @@ const PRIMARY = '#6C63FF';
 export default function Login() {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
+  const [erros, setErros] = useState<{ cpf?: string; senha?: string }>({});
   const { login } = useAuth();
   const insets = useSafeAreaInsets();
 
   function handleLogin() {
-    console.log('Login:', cpf, senha);
+    const novosErros: { cpf?: string; senha?: string } = {};
+    const cpfNumeros = cpf.replace(/\D/g, '');
+
+    if (!cpfNumeros) {
+      novosErros.cpf = 'Informe o CPF';
+    } else if (cpfNumeros.length !== 11) {
+      novosErros.cpf = 'O CPF deve ter 11 dígitos';
+    }
+
+    if (!senha) {
+      novosErros.senha = 'Informe a senha';
+    } else if (senha.length < 6) {
+      novosErros.senha = 'A senha deve ter no mínimo 6 caracteres';
+    }
+
+    setErros(novosErros);
+    if (Object.keys(novosErros).length > 0) return;
+
     login();
   }
 
@@ -51,8 +69,10 @@ export default function Login() {
             onChangeText={setCpf}
             keyboardType="numeric"
             autoCapitalize="none"
-            style={s.input}
+            maxLength={11}
+            style={[s.input, erros.cpf && s.inputErro]}
           />
+          {erros.cpf && <Text style={s.erro}>{erros.cpf}</Text>}
 
           <Text style={s.label}>Senha</Text>
           <TextInput
@@ -61,8 +81,9 @@ export default function Login() {
             value={senha}
             onChangeText={setSenha}
             secureTextEntry
-            style={s.input}
+            style={[s.input, erros.senha && s.inputErro]}
           />
+          {erros.senha && <Text style={s.erro}>{erros.senha}</Text>}
 
           <Pressable
             onPress={handleLogin}
@@ -131,6 +152,15 @@ const s = StyleSheet.create({
     padding: 14,
     fontSize: 16,
     color: '#1a1a2e',
+  },
+  inputErro: {
+    borderColor: '#e53935',
+  },
+  erro: {
+    color: '#e53935',
+    fontSize: 13,
+    marginTop: 4,
+    marginLeft: 4,
   },
   btnPrimary: {
     backgroundColor: PRIMARY,
