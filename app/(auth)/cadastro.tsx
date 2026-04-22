@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -10,12 +11,17 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { showAlert } from '@/lib/showAlert';
+
+import { salvarUsuario } from '@/lib/userStorage';
 
 const PRIMARY = '#6C63FF';
 
 type Erros = {
   nome?: string;
   cpf?: string;
+  senha?: string;
+  confirmaSenha?: string;
   idade?: string;
   cep?: string;
 };
@@ -23,6 +29,8 @@ type Erros = {
 export default function Cadastro() {
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmaSenha, setConfirmaSenha] = useState('');
   const [idade, setIdade] = useState('');
   const [curso, setCurso] = useState('');
   const [cep, setCep] = useState('');
@@ -51,7 +59,7 @@ export default function Cadastro() {
     }
   }
 
-  function handleCadastro() {
+  async function handleCadastro() {
     const novosErros: Erros = {};
     const cpfNumeros = cpf.replace(/\D/g, '');
     const cepNumeros = cep.replace(/\D/g, '');
@@ -67,6 +75,18 @@ export default function Cadastro() {
       novosErros.cpf = 'O CPF deve ter 11 dígitos';
     }
 
+    if (!senha) {
+      novosErros.senha = 'Informe a senha';
+    } else if (senha.length < 6) {
+      novosErros.senha = 'A senha deve ter no mínimo 6 caracteres';
+    }
+
+    if (!confirmaSenha) {
+      novosErros.confirmaSenha = 'Confirme a senha';
+    } else if (confirmaSenha !== senha) {
+      novosErros.confirmaSenha = 'As senhas não coincidem';
+    }
+
     if (!idade) {
       novosErros.idade = 'Informe a idade';
     } else if (!Number.isInteger(idadeNumero) || idadeNumero <= 0) {
@@ -80,9 +100,33 @@ export default function Cadastro() {
     }
 
     setErros(novosErros);
-    if (Object.keys(novosErros).length > 0) return;
+    if (Object.keys(novosErros).length > 0) {
+      showAlert('Dados inválidos', 'Verifique os campos e tente novamente.');
+      return;
+    }
 
-    console.log({ nome, cpf, idade, curso, cep, rua, cidade, estado });
+    try {
+      await salvarUsuario({
+        nome: nome.trim(),
+        cpf: cpfNumeros,
+        senha,
+        idade,
+        curso,
+        cep: cepNumeros,
+        rua,
+        cidade,
+        estado,
+      });
+    } catch (e) {
+      showAlert('Erro', 'Não foi possível salvar o cadastro.');
+      return;
+    }
+
+    showAlert(
+      'Cadastro realizado!',
+      `Bem-vindo(a), ${nome.trim()}! Faça login para continuar.`,
+    );
+    router.replace('/(auth)/login');
   }
 
   return (
@@ -126,6 +170,30 @@ export default function Cadastro() {
             style={[s.input, erros.cpf && s.inputErro]}
           />
           {erros.cpf && <Text style={s.erro}>{erros.cpf}</Text>}
+
+          <Text style={s.label}>Senha</Text>
+          <TextInput
+            placeholder="Mínimo 6 caracteres"
+            placeholderTextColor="#999"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+            style={[s.input, erros.senha && s.inputErro]}
+          />
+          {erros.senha && <Text style={s.erro}>{erros.senha}</Text>}
+
+          <Text style={s.label}>Confirmar senha</Text>
+          <TextInput
+            placeholder="Repita a senha"
+            placeholderTextColor="#999"
+            value={confirmaSenha}
+            onChangeText={setConfirmaSenha}
+            secureTextEntry
+            style={[s.input, erros.confirmaSenha && s.inputErro]}
+          />
+          {erros.confirmaSenha && (
+            <Text style={s.erro}>{erros.confirmaSenha}</Text>
+          )}
 
           <View style={s.row}>
             <View style={s.rowHalf}>

@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
+import { showAlert } from '@/lib/showAlert';
+import { buscarUsuario, definirUsuarioAtual } from '@/lib/userStorage';
 
 const PRIMARY = '#6C63FF';
 
@@ -23,7 +25,7 @@ export default function Login() {
   const { login } = useAuth();
   const insets = useSafeAreaInsets();
 
-  function handleLogin() {
+  async function handleLogin() {
     const novosErros: { cpf?: string; senha?: string } = {};
     const cpfNumeros = cpf.replace(/\D/g, '');
 
@@ -40,8 +42,19 @@ export default function Login() {
     }
 
     setErros(novosErros);
-    if (Object.keys(novosErros).length > 0) return;
+    if (Object.keys(novosErros).length > 0) {
+      showAlert('Dados inválidos', 'Verifique os campos e tente novamente.');
+      return;
+    }
 
+    const usuario = await buscarUsuario(cpfNumeros, senha);
+    if (!usuario) {
+      showAlert('Falha no login', 'CPF ou senha incorretos.');
+      return;
+    }
+
+    await definirUsuarioAtual(usuario);
+    showAlert('Bem-vindo(a)!', `Olá, ${usuario.nome}!`);
     login();
   }
 

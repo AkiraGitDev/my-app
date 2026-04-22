@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm root *)",
       "Bash(npm list *)",
-      "Bash(npm config *)"
+      "Bash(npm config *)",
+      "Bash(npx expo *)"
     ]
   }
 }
